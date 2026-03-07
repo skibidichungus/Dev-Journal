@@ -1,9 +1,10 @@
 export type JournalEntry = {
   id: string;
-  date: string;
-  topic: string;
-  summary: string;
-  keyTakeaways: string[];
+  title: string;
+  content: string;
+  entryDate: string;
+  tags: string[];
+  understandingScore: number;
   createdAt: string;
   updatedAt: string;
 };
