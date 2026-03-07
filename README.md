@@ -1,6 +1,6 @@
 # Dev Jouurnal
 
-Dev Jouurnal is a Next.js App Router project for tracking daily software engineering learning.
+Dev Journal is a Next.js App Router project for tracking daily software engineering learning.
 
 ## Tech Stack
 
