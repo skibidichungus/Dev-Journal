@@ -1,13 +1,19 @@
-type DatabaseClient = 
-{
-  isConnected: boolean;
+import { PrismaClient } from "@prisma/client";
+
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClient;
 };
 
 /**
- * Minimal placeholder for database setup.
- * Replace with Prisma/Drizzle/Supabase client initialization.
+ * Reuse one Prisma client in development to avoid extra connections
+ * during hot reload.
  */
-export const dbClient: DatabaseClient = 
-{
-  isConnected: false,
-};
+export const dbClient =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: ["error", "warn"],
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = dbClient;
+}
