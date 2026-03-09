@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: devjournal-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: devjournal
+      POSTGRES_PASSWORD: devjournal
+      POSTGRES_DB: devjournal
+    ports:
+      - "5432:5432"
+    volumes:
+      - devjournal_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devjournal -d devjournal"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  devjournal_postgres_data:
