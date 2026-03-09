@@ -1,14 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type JournalEntryFormProps = {
+  initialValues?: {
+    title: string;
+    entryDate: string;
+    content: string;
+    tags: string[];
+    understandingScore: number;
+  };
+  submitUrl?: string;
+  submitMethod?: "POST" | "PUT";
+  submitButtonLabel?: string;
   redirectPath?: string;
 };
 
 type FormValues = {
-  title: string
+  title: string;
   entryDate: string;
   content: string;
   tags: string;
@@ -23,11 +33,37 @@ const INITIAL_FORM_VALUES: FormValues = {
   understandingScore: "3",
 };
 
-export function JournalEntryForm({ redirectPath = "/" }: JournalEntryFormProps) {
+function formatInitialValues(initialValues: JournalEntryFormProps["initialValues"]): FormValues {
+  if (!initialValues) {
+    return INITIAL_FORM_VALUES;
+  }
+
+  return {
+    title: initialValues.title,
+    entryDate: initialValues.entryDate.slice(0, 10),
+    content: initialValues.content,
+    tags: initialValues.tags.join(", "),
+    understandingScore: String(initialValues.understandingScore),
+  };
+}
+
+export function JournalEntryForm({
+  initialValues,
+  submitUrl = "/api/journal",
+  submitMethod = "POST",
+  submitButtonLabel = "Save Entry",
+  redirectPath = "/",
+}: JournalEntryFormProps) {
   const router = useRouter();
-  const [formValues, setFormValues] = useState<FormValues>(INITIAL_FORM_VALUES);
+  const [formValues, setFormValues] = useState<FormValues>(() =>
+    formatInitialValues(initialValues)
+  );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setFormValues(formatInitialValues(initialValues));
+  }, [initialValues]);
 
   function handleFieldChange(field: keyof FormValues, value: string) {
     setFormValues((currentValues) => ({
@@ -76,8 +112,8 @@ export function JournalEntryForm({ redirectPath = "/" }: JournalEntryFormProps) 
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/journal", {
-        method: "POST",
+      const response = await fetch(submitUrl, {
+        method: submitMethod,
         headers: {
           "Content-Type": "application/json",
         },
@@ -98,7 +134,7 @@ export function JournalEntryForm({ redirectPath = "/" }: JournalEntryFormProps) 
       router.refresh();
     } catch (error) {
       console.error(error);
-      setErrorMessage("Could not save entry. Please try again.");
+      setErrorMessage("Could not save changes. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -192,7 +228,7 @@ export function JournalEntryForm({ redirectPath = "/" }: JournalEntryFormProps) 
         disabled={isSubmitting}
         className="inline-flex items-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
       >
-        {isSubmitting ? "Saving..." : "Save Entry"}
+        {isSubmitting ? "Saving..." : submitButtonLabel}
       </button>
     </form>
   );
