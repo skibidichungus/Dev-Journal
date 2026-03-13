@@ -28,10 +28,20 @@ export async function GET(_request: NextRequest, context: RouteContext) {
   }
 }
 
+import { validateJournalPayload } from "@/lib/validation";
+
 export async function PUT(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
     const body = await request.json();
+
+    const validationError = validateJournalPayload(body, true);
+    if (validationError) {
+      return NextResponse.json(
+        { error: validationError },
+        { status: 400 }
+      );
+    }
 
     const updatedEntry = await updateJournalEntry(id, body);
 

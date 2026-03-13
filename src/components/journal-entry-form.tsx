@@ -104,10 +104,14 @@ export function JournalEntryForm({
       return;
     }
 
-    const parsedTags = formValues.tags
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean);
+    const parsedTags = Array.from(
+      new Set(
+        formValues.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean)
+      )
+    );
 
     setIsSubmitting(true);
 

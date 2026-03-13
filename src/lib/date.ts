@@ -7,5 +7,6 @@ export function formatJournalDate(isoDate: string): string {
 
   return new Intl.DateTimeFormat("en-US", {
     dateStyle: "medium",
+    timeZone: "UTC",
   }).format(parsed);
 }
